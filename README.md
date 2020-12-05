@@ -1,1 +1,1 @@
-# SpendAttibutesService
+# bGames-StandardAttributesService
