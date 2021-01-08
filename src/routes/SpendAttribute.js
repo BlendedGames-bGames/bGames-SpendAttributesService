@@ -207,7 +207,7 @@ function spendAttributes(dataChanges){
     console.log(dataChanges)
     var options = {
         host : 'bgames-apirestpostatt.herokuapp.com',
-        path: ('/player_attributes_single')       
+        path: ('/player_attributes')       
     };
     var url = "https://"+options.host + options.path;
     console.log("URL "+url);
@@ -239,7 +239,7 @@ async function getAndCompareAttributeLevels(new_attribute_expense){
 
   var options = {
     host : 'bgames-apirestget.herokuapp.com',
-    path: ('/player_attributes_single')       
+    path: ('/player_attributes')       
     };
     var url = "https://"+options.host + options.path;
     const MEDIUM_GET_URL = url;
@@ -261,18 +261,20 @@ async function getAndCompareAttributeLevels(new_attribute_expense){
         console.log(response.data)
         // Ej: attributes: [18,20]
         // EJ: new_data = [9,1]
-        var attribute = response.data.data
-        var result = attribute-new_attribute_expense.new_data
-        console.log(attribute)
-        console.log(new_attribute_expense.new_data)
+        var attributes = response.data.attributes
+        var single_result;
+        var results = []
 
-        if(result >= 0){
-            return result
+        for (let i = 0; i < attributes.length; i++) {
+            single_result = attributes[i]-new_attribute_expense.new_data[i]
+            if(single_result >= 0){
+                results.push(single_result)
+            }
+            else{
+                return -1;
+            }
         }
-        else{
-            return -1
-        }
-        
+        return results
     } 
     catch (error) {
         console.error(error);
@@ -340,17 +342,19 @@ async function getConversion(id_videogame,id_modifiable_mechanic,data){
     }
 }
 
-function conversionDataAttribute(operation,data){
-    // operation Ej: 'x+2'
-    // data Ej: 2
-    
-    var result;   
-    node = math.parse(operation)   // returns the root Node of an expression tree
-    code = node.compile()        // returns {evaluate: function (scope) {...}}
-    result = code.evaluate({x: data}) // returns result
-    
+function conversionDataAttribute(operations,data){
+    // operations Ej: ['x+2','sqrt(x+5)','x/4']
+    // data_changes Ej: [2,20,4]
+    var operation,node,code;
+    var results = []
+    for (let i = 0; i < operations.length; i++) {
+        operation = operations[i];
+        node = math.parse(operation)   // returns the root Node of an expression tree
+        code = node.compile()        // returns {evaluate: function (scope) {...}}
+        results.push(code.evaluate({x: data})) // returns result
+    }
     //Ej [4,5,1]
-    return result
+    return results
 }
 
 
