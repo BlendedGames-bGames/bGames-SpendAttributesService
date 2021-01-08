@@ -12,7 +12,7 @@ const port = process.env.PORT || 3031;
 app.use(express.json());
 
 //Routes
-app.use(require('./routes/StandardAttribute'))
+app.use(require('./routes/SpendAttribute'))
 //app.use(require('./routes/PlayerConfig'))
 
 //Starting the server
