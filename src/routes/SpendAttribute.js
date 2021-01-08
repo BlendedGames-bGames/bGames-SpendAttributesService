@@ -321,6 +321,7 @@ async function getConversion(id_videogame,id_modifiable_mechanic,data){
 
             "id_conversion":response.data.id_conversion,
             "id_attributes": response.data.id_attributes,
+            "options":  response.data.options,
             "operations":  response.data.operations
 
         }
