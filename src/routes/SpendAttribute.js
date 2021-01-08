@@ -42,45 +42,65 @@ Input:
 Output: Void (stores the data in the db)
 Description: Calls the b-Games-ApirestPostAtt service 
 */
-router.post('/standard_attributes_apis', jsonParser, wrap(async(req,res,next) => { 
-    res.status(200).json({ body: req.body })
+router.post('/spend_attributes_apis', jsonParser, wrap(async(req,res,next) => { 
     var id_player = req.body.id_player
-    var id_sensor_endpoint = req.body.id_sensor_endpoint
+    var id_videogame = req.body.id_videogame
     // [2,20,4,0,0]
-    var data_changes = req.body.data_changes
+    var id_modifiable_mechanic = req.body.id_modifiable_mechanic
     // Ej: ['chess_blitz,records,win', 'elo','puzzle_challenge,record','puzzle_rush','chess_rapid,record,win']
-    var watch_parameters = req.body.watch_parameters
+    var data = req.body.data
 
     
-    var conversions_data = await getConversions(id_sensor_endpoint,data_changes,watch_parameters)
-    
-    //ids: Ej [2,5,8]
-    var id_conversions = conversions_data.id_conversions
+    var conversions_data = await getConversion(id_videogame,id_modifiable_mechanic,data)
 
-    //id_subattributes: Ej [1,4,7]
-    var id_subattributes = conversions_data.id_subattributes
+    //ids: Ej 2
+    var id_conversion = conversions_data.id_conversion
 
-    //operations: Ej ['x+2','sqrt(x+5)','x/4']
+    //id_subattributes: 1
+    var id_attributes = conversions_data.id_attributes
+
+    //operations: Ej 'x+2'
     var operations = conversions_data.operations
-
-    //new_data: Ej [2,20,4]
-    var new_data = conversions_data.new_data
 
     console.log('conversions_data')
     console.log(conversions_data)
     //Ej [4,5,1]
-    var results = conversionDataAttribute(operations,new_data)
+    var result = conversionDataAttribute(operations,data)
     console.log('/n resultado del reemplazo')
-    console.log(results)
-    var adquired_subattributes ={  
+    console.log(result)
+    var expended_attributes ={  
         "id_player": id_player,        
-        "id_sensor_endpoint": id_sensor_endpoint,
-        "id_conversions": id_conversions,   
-        "id_subattributes":id_subattributes,
-        "new_data": results
+        "id_modifiable_mechanic": id_modifiable_mechanic,
+        "id_conversion": id_conversion,   
+        "id_attributes":id_attributes,
+        "new_data": result
     }
 
-    postAdquiredSubattribute(adquired_subattributes)
+    var new_attribute_expense = {
+        "id_player":id_player,
+        "id_attributes": id_attributes,       
+        "new_data":result
+    }
+
+    const new_attribute_level;
+    var compareResult = getAndCompareAttributeLevels(new_attribute_expense)
+    if(compareResult != -1){
+        new_attribute_level = {
+            "id_player":id_player,
+            "id_attributes": id_attributes,       
+            "new_data":compareResult
+        }
+        spendAttributes(new_attribute_level)
+        res.status(200).json({ message: true })
+
+        postExpendedAttribute(expended_attributes)
+
+    }
+    else{
+        //No se tienen atributo suficiente para gastar en mecanicas
+        res.status(400).json({ message: false })
+
+    }
     
     /*
     
@@ -90,30 +110,25 @@ router.post('/standard_attributes_apis', jsonParser, wrap(async(req,res,next) =>
     }
     */
 
-    var id_attributes = await getAttributesIds(id_subattributes)
-    console.log("id_attributes")
-
-    console.log(id_attributes)
-
-    var new_attribute_experience = {
-        "id_player":id_player,
-        "id_attributes": id_attributes,       
-        "new_data":results
-    }
-
-
-    putNewAttributesLevels(new_attribute_experience)
 }))
 /*
-Input:  Json of sensor data
+Input:  
+ var expended_attributes ={  
+        "id_player": id_player,        
+        "id_videogame": id_videogame,        
+        "id_modifiable_mechanic": id_modifiable_mechanic,
+        "id_conversion": id_conversion,   
+        "id_attributes":id_attributes,
+        "new_data": result
+    }
 Output: Void (stores the data in the db)
 Description: Calls the b-Games-ApirestPostAtt service 
 */
-async function postAdquiredSubattribute(adquired_subattributes){
+async function postExpendedAttribute(spend_attributes){
     
     var options = {
         host : 'bgames-apirestpostatt.herokuapp.com',
-        path: ('/adquired_subattribute/')       
+        path: ('/spent_attribute/')       
     };
     var url = "https://"+options.host + options.path;
     console.log("URL "+url);
@@ -127,7 +142,7 @@ async function postAdquiredSubattribute(adquired_subattributes){
 
     var options2 = {
         host : 'bgames-apirestget.herokuapp.com',
-        path: ('/subattribute_conversion_sensor_endpoint/'+adquired_subattributes.id_sensor_endpoint)     
+        path: ('/modifiable_conversion_attribute')     
     };
     var url2 = "https://"+options2.host + options2.path;
     console.log("URL "+url2);
@@ -135,33 +150,36 @@ async function postAdquiredSubattribute(adquired_subattributes){
     const MEDIUM_POST_URL2 = url2;
 
     var modifiedAdquired = {
-        "id_conversions":adquired_subattributes.id_conversions,
-        "id_subattributes":adquired_subattributes.id_subattributes
+        "id_videogame": id_videogame,  
+        "id_modifiable_mechanic":spend_attributes.id_modifiable_mechanic,
+        "id_conversion":spend_attributes.id_conversion,
+        "id_attributes":spend_attributes.id_attributes
     }
     console.log("Im going to send this")
     console.log(JSON.stringify(modifiedAdquired))
-    var subatt_conv_endpoint_relation;
+    var modifiable_conversion_attribute_relation;
 
     try {
         const response = await axios.get(MEDIUM_POST_URL2,{ headers:headers, data: modifiedAdquired})
-        subatt_conv_endpoint_relation = response.data.id_subattributes_conversion_sensor_endpoint
+        modifiable_conversion_attribute_relation = response.data.id_modifiable_conversion_attribute
         console.log("aqui va")
-        console.log(subatt_conv_endpoint_relation)
+        console.log(modifiable_conversion_attribute_relation)
 
     } catch (error) {
         console.log(error)
         
     }
-    const adquired_subattribute_final = {
-        "id_player":adquired_subattributes.id_player,
-        "id_subattributes_conversion_sensor_endpoint":subatt_conv_endpoint_relation,
-        "new_data":adquired_subattributes.new_data
+    const expended_attribute_final = {
+        "id_player":spend_attributes.id_player,
+        "id_videogame": spend_attributes.id_videogame,
+        "id_modifiable_conversion_attribute":modifiable_conversion_attribute_relation,
+        "new_data":spend_attributes.new_data
     }
     console.log("Im going to post this")
-    console.log(JSON.stringify(adquired_subattribute_final))
+    console.log(JSON.stringify(expended_attribute_final))
     try {
        
-        const response = axios.post(MEDIUM_POST_URL, adquired_subattribute_final);
+        const response = axios.post(MEDIUM_POST_URL, expended_attribute_final);
         console.log(response)
         
     } 
@@ -173,59 +191,27 @@ async function postAdquiredSubattribute(adquired_subattributes){
 /*
 Input:  
 
-var new_attribute_experience = {
-    "id_player":id_player,
-    "id_attributes": actual_attributes_data.id_attributes,        
-    "actual_data": actual_attributes_data.actual_data,
-    "new_data":results
-}
-
-Ej:
-var new_attribute_experience = {
-        "id_player":1,
-        "id_attributes": [1,1,2],        
-        "actual_data": [20,20,40],
-        "new_data":[4,5,1]
+var dataChanges ={  
+    "id_player": new_attribute_expense.id_player,//[1]   
+    "id_attributes": new_attribute_expense.id_attributes,//[1]
+    "new_data": updatedAttributes //[19]
 }
     
 Output: Void (stores the data in the db)
 Description: Calls the b-Games-ApirestPostAtt service 
 */
-async function putNewAttributesLevels(new_attribute_experience){
-
-    var updated_attributes = sumAttributeData(new_attribute_experience.id_attributes,new_attribute_experience.new_data)
-    console.log('updated_attributes')
-    console.log(updated_attributes)
-
+function spendAttributes(dataChanges){
+   
+    console.log('last changes:')
+    console.log(dataChanges)
     var options = {
         host : 'bgames-apirestpostatt.herokuapp.com',
-        path: ('/player_attributes')       
+        path: ('/player_attributes_single')       
     };
     var url = "https://"+options.host + options.path;
     console.log("URL "+url);
     // construct the URL to post to a publication
     const MEDIUM_PUT_URL = url;
-    let player_attributes = {
-        "id_player":new_attribute_experience.id_player, //EJ: 1
-        "id_attributes":updated_attributes.id_attributes// Ej: [1,4]
-    }
-    //Ej: [27,21]
-    var updatedAttributes = await updateAttributeLevels(player_attributes,updated_attributes.new_data)
-    console.log('updatedAttributes 2')
-    console.log(updatedAttributes)
-    var dataChanges ={  
-        "id_player": new_attribute_experience.id_player,//[1]   
-        //Ej: id_attributes = [3,4,6,7,10], distintos
-        "id_attributes": updated_attributes.id_attributes,//[1]
-        "new_data": updatedAttributes //[19]
-    }
-    console.log('last changes:')
-    console.log(dataChanges)
-    var headers = {
-        'Content-Type': 'application/json;charset=UTF-8',
-        'Access-Control-Allow-Origin': '*'
-    };
-
     try {
         const response = axios.put(MEDIUM_PUT_URL,dataChanges);
         console.log(response)
@@ -237,30 +223,69 @@ async function putNewAttributesLevels(new_attribute_experience){
 }
 
 /*
+Input:  
+
+Ej:
+var new_attribute_expense = {
+        "id_player":id_player,
+        "id_attributes": id_attributes,       
+        "new_data":result
+}
+Output: Void (stores the data in the db)
+Description: Calls the b-Games-ApirestPostAtt service 
+*/
+async function getAndCompareAttributeLevels(new_attribute_expense){
+
+  var options = {
+    host : 'bgames-apirestget.herokuapp.com',
+    path: ('/player_attributes_single')       
+    };
+    var url = "https://"+options.host + options.path;
+    const MEDIUM_GET_URL = url;
+
+    var headers = {
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Access-Control-Allow-Origin': '*'
+    };
+    var dataChanges = {
+        "id_player": new_attribute_expense.id_player,
+        "id_attributes": new_attribute_expense.id_attributes
+    }
+    console.log('dataChanges in updateAttributeLevels')
+    console.log(dataChanges)
+
+    try {
+        const response = await axios.get(MEDIUM_GET_URL,{ headers:headers, data: dataChanges})
+        console.log('response')
+        console.log(response.data)
+        // Ej: attributes: [18,20]
+        // EJ: new_data = [9,1]
+        var attribute = response.data.data
+        var result = attribute-new_attribute_expense.new_data
+        if(result >= 0){
+            return result
+        }
+        else{
+            return -1
+        }
+        
+    } 
+    catch (error) {
+        console.error(error);
+    }
+    
+}
+
+/*
 Input:  Json of sensor data
 Output: Void (stores the data in the db)
 Description: Calls the b-Games-ApirestPostAtt service 
 */
-async function getConversions(id_sensor_endpoint,data_changes,watch_parameters){
-
-    var changedParameters = []
-    var new_data = []
-    data_changes.forEach((parameter,index) => {
-            //Si no hubo cambio en el watch_parameter no se va a buscar su conversion
-            if(parameter !== 0){
-                changedParameters.push( watch_parameters[index])
-                new_data.push( data_changes[index])
-
-            }
-    });
-
-
-    console.log(changedParameters);
-    console.log(new_data);
+async function getConversion(id_videogame,id_modifiable_mechanic,data){
 
     var options = {
         host : 'bgames-sensormanagement.herokuapp.com',
-        path: ('/conversions')       
+        path: ('/conversion_spend_attribute')       
     };
     var url = "https://"+options.host + options.path;
     console.log("URL "+url);
@@ -268,8 +293,8 @@ async function getConversions(id_sensor_endpoint,data_changes,watch_parameters){
     const MEDIUM_POST_URL = url;
     
     var dataChanges ={  
-        "id_sensor_endpoint": id_sensor_endpoint,
-        "parameters_watched":changedParameters                                        
+        "id_videogame": id_videogame,
+        "id_modifiable_mechanic": id_modifiable_mechanic               
     }
     var headers = {
         'Content-Type': 'application/json;charset=UTF-8',
@@ -286,7 +311,7 @@ async function getConversions(id_sensor_endpoint,data_changes,watch_parameters){
         /*
          var results ={  
                 "id_conversion": 2,   
-                "id_subattributes": 2,
+                "id_attribute": 1,
                 "operations": 'x+2'
         } 
         */       
@@ -294,10 +319,9 @@ async function getConversions(id_sensor_endpoint,data_changes,watch_parameters){
         //Procesar y result que se quiere: 
         var results = {
 
-            "id_conversions":response.data.id_conversions,
-            "id_subattributes": response.data.id_subattributes,
-            "operations":  response.data.operations,
-            "new_data": new_data
+            "id_conversion":response.data.id_conversion,
+            "id_attributes": response.data.id_attributes,
+            "operations":  response.data.operations
 
         }
         
@@ -310,141 +334,20 @@ async function getConversions(id_sensor_endpoint,data_changes,watch_parameters){
         console.error(error);
     }
 }
-async function updateAttributeLevels(player_attributes,new_data){
-   /*
-   
-   player_attributes = {id_player, id_attributes}
-   */
-    var options = {
-        host : 'bgames-apirestget.herokuapp.com',
-        path: ('/player_attributes')       
-    };
-    var url = "https://"+options.host + options.path;
-    const MEDIUM_GET_URL = url;
+
+function conversionDataAttribute(operation,data){
+    // operation Ej: 'x+2'
+    // data Ej: 2
     
-    var headers = {
-        'Content-Type': 'application/json;charset=UTF-8',
-        'Access-Control-Allow-Origin': '*'
-    };
-    var dataChanges = {
-        "id_player": player_attributes.id_player,
-        "id_attributes": player_attributes.id_attributes
-    }
-    console.log('dataChanges in updateAttributeLevels')
-    console.log(dataChanges)
-
-    try {
-        const response = await axios.get(MEDIUM_GET_URL,{ headers:headers, data: dataChanges})
-        console.log('response')
-        console.log(response.data)
-         // Ej: attributes: [18,20]
-         // EJ: new_data = [9,1]
-        var attributes = response.data.attributes
-        for (let i = 0; i < attributes.length; i++) {
-            attributes[i]+= new_data[i]            
-        }
-        // => [27,21]
-        return attributes
-        
-    } 
-    catch (error) {
-        console.error(error);
-    }
-}
-
-/*
-Input:  
-
-"id_subattributes": Ej [5,2,1],   
-
-
-Output: 
-
-"id_attributes": [1,1,2] Ordenado de menor a mayor
-Description: Calls the b-Games-ApirestPostAtt service 
-*/
-async function getAttributesIds(id_subattributes){
-   
-    var options = {
-        host : 'bgames-apirestget.herokuapp.com',
-        path: ('/attributes_by_subattributes')       
-    };
-    var url = "https://"+options.host + options.path;
-    const MEDIUM_GET_URL = url;
+    var result;   
+    node = math.parse(operation)   // returns the root Node of an expression tree
+    code = node.compile()        // returns {evaluate: function (scope) {...}}
+    result = code.evaluate({x: data}) // returns result
     
-    var headers = {
-        'Content-Type': 'application/json;charset=UTF-8',
-        'Access-Control-Allow-Origin': '*'
-    };
-    console.log('Esto es lo que me entro: ')
-    console.log(id_subattributes)
-
-    var dataChanges = {
-        "id_subattributes": id_subattributes
-    }
-
-    try {
-        const response = await axios.get(MEDIUM_GET_URL,{ headers:headers, data: dataChanges})
-        // Ej: id_attributes: [1,1,2]
-        var id_attributes = response.data.id_attributes
-        console.log(`estos son los atributos`)
-        console.log(id_attributes)
-        return id_attributes
-        
-    } 
-    catch (error) {
-        console.error(error);
-    }
-}
-
-
-function conversionDataAttribute(operations,data_changes){
-    // operations Ej: ['x+2','sqrt(x+5)','x/4']
-    // data_changes Ej: [2,20,4]
-    var operation,data,node,code;
-    var results = []
-    for (let i = 0; i < operations.length; i++) {
-        operation = operations[i];
-        data = data_changes[i];
-        node = math.parse(operation)   // returns the root Node of an expression tree
-        code = node.compile()        // returns {evaluate: function (scope) {...}}
-        results.push(code.evaluate({x: data})) // returns result
-    }
     //Ej [4,5,1]
-    return results
+    return result
 }
 
-/*
-
-    "id_attributes": [1,1,2],        
-    "new_data":[4,5,1]
-
-     =>
-
-    "new_data": [9,1]
- */
-function sumAttributeData(id_attributes,new_data){
-    var id_aux = 1
-    var index = 0
-    const distinct_ids = [...new Set(id_attributes)] // [1,1,1,2,3,3] => [1,2,3], distinct values (only primitive types)
-    var almost_results = new Array(id_attributes.length).fill(0);
-    for (let i = 0; i < id_attributes.length; i++) {
-        if(id_aux !== id_attributes[i]){
-            index++
-            id_aux = id_attributes[i]
-        }
-        almost_results[index] += new_data[i];
-        
-    }
-
-    let result = almost_results.filter(data => data !== 0)
-    let result_object = {
-        "id_attributes": distinct_ids,
-        "new_data":result
-    }
-    return result_object
-    
-}
 
 
 /*
