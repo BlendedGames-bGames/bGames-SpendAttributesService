@@ -83,7 +83,7 @@ router.post('/spend_attributes_apis', jsonParser, wrap(async(req,res,next) => {
     }
 
     var new_attribute_level;
-    var compareResult = getAndCompareAttributeLevels(new_attribute_expense)
+    var compareResult = await getAndCompareAttributeLevels(new_attribute_expense)
     if(compareResult != -1){
         new_attribute_level = {
             "id_player":id_player,
@@ -262,6 +262,9 @@ async function getAndCompareAttributeLevels(new_attribute_expense){
         // EJ: new_data = [9,1]
         var attribute = response.data.data
         var result = attribute-new_attribute_expense.new_data
+        console.log(attribute)
+        console.log(new_attribute_expense.new_data)
+
         if(result >= 0){
             return result
         }
