@@ -150,7 +150,7 @@ async function postExpendedAttribute(spend_attributes){
     const MEDIUM_POST_URL2 = url2;
 
     var modifiedAdquired = {
-        "id_videogame": id_videogame,  
+        "id_videogame": spend_attributes.id_videogame,  
         "id_modifiable_mechanic":spend_attributes.id_modifiable_mechanic,
         "id_conversion":spend_attributes.id_conversion,
         "id_attributes":spend_attributes.id_attributes
