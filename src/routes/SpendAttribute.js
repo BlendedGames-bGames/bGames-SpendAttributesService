@@ -82,7 +82,7 @@ router.post('/spend_attributes_apis', jsonParser, wrap(async(req,res,next) => {
         "new_data":result
     }
 
-    const new_attribute_level;
+    var new_attribute_level;
     var compareResult = getAndCompareAttributeLevels(new_attribute_expense)
     if(compareResult != -1){
         new_attribute_level = {
