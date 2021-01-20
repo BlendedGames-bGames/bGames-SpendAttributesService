@@ -17,6 +17,11 @@ var jsonParser = bodyParser.json()
 
 const math = require('mathjs')
 
+router.get("/", (req,res) =>{
+    var variable = req.body
+    res.status(200).json(variable)
+
+});
 
 // PARA ESTE MICROSERVICIO SE NECESITA INGRESAR LOS DATOS DE LA SIGUIENTE MANERA:
 /* Ejemplo de Json del Body para el POST
