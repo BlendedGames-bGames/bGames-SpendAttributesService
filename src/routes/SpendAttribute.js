@@ -133,7 +133,7 @@ Description: Calls the b-Games-ApirestPostAtt service
 async function postExpendedAttribute(spend_attributes){
     
     var options = {
-        host : 'bgames-apirestpostatt.herokuapp.com',
+        host : '164.90.156.141:3002',
         path: ('/spent_attribute/')       
     };
     var url = "https://"+options.host + options.path;
@@ -147,7 +147,7 @@ async function postExpendedAttribute(spend_attributes){
     };
 
     var options2 = {
-        host : 'bgames-apirestget.herokuapp.com',
+        host : '164.90.156.141:3001',
         path: ('/modifiable_conversion_attribute')     
     };
     var url2 = "https://"+options2.host + options2.path;
@@ -211,7 +211,7 @@ function spendAttributes(dataChanges){
     console.log('last changes:')
     console.log(dataChanges)
     var options = {
-        host : 'bgames-apirestpostatt.herokuapp.com',
+        host : '164.90.156.141:3002',
         path: ('/player_attributes')       
     };
     var url = "https://"+options.host + options.path;
@@ -243,7 +243,7 @@ Description: Calls the b-Games-ApirestPostAtt service
 async function getAndCompareAttributeLevels(new_attribute_expense){
 
   var options = {
-    host : 'bgames-apirestget.herokuapp.com',
+    host : '164.90.156.141:3001',
     path: ('/player_attributes')       
     };
     var url = "https://"+options.host + options.path;
@@ -295,7 +295,7 @@ Description: Calls the b-Games-ApirestPostAtt service
 async function getConversion(id_videogame,id_modifiable_mechanic,data){
 
     var options = {
-        host : 'bgames-sensormanagement.herokuapp.com',
+        host : '164.90.156.141:3007',
         path: ('/conversion_spend_attribute')       
     };
     var url = "https://"+options.host + options.path;
@@ -401,7 +401,7 @@ router.post('/StandardAttributes/', (req,res,next)=>{
         console.log(data2);
 
         var options = {
-            host : 'bgames-apirestpostatt.herokuapp.com',
+            host : '164.90.156.141:3002',
             path: ('/attributes/'),
             method: 'POST',
             headers: {
