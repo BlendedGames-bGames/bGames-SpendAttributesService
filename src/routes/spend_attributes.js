@@ -131,7 +131,7 @@ async function postExpendedAttribute(spend_attributes){
         host : '164.90.156.141:3002',
         path: ('/spent_attribute/')       
     };
-    var url = "https://"+options.host + options.path;
+    var url = "http://"+options.host + options.path;
     console.log("URL "+url);
     // construct the URL to post to a publication
     const MEDIUM_POST_URL = url;
@@ -209,7 +209,7 @@ function spendAttributes(dataChanges){
         host : '164.90.156.141:3002',
         path: ('/player_attributes')       
     };
-    var url = "https://"+options.host + options.path;
+    var url = "http://"+options.host + options.path;
     console.log("URL "+url);
     // construct the URL to post to a publication
     const MEDIUM_PUT_URL = url;
@@ -241,7 +241,7 @@ async function getAndCompareAttributeLevels(new_attribute_expense){
     host : '164.90.156.141:3001',
     path: ('/player_attributes')       
     };
-    var url = "https://"+options.host + options.path;
+    var url = "http://"+options.host + options.path;
     const MEDIUM_GET_URL = url;
 
     var headers = {
@@ -293,7 +293,7 @@ async function getConversion(id_videogame,id_modifiable_mechanic,data){
         host : '164.90.156.141:3007',
         path: ('/conversion_spend_attribute')       
     };
-    var url = "https://"+options.host + options.path;
+    var url = "http://"+options.host + options.path;
     console.log("URL "+url);
     // construct the URL to post to a publication
     const MEDIUM_POST_URL = url;
