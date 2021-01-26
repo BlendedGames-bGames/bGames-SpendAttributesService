@@ -1,10 +1,7 @@
 const express = require('express');
-const router = express.Router();
+const spend_attributes = express.Router();
+import { testEnvironmentVariable } from '../settings';
 
-var http = require('http');
-const qs = require('querystring');
-
-var common = require('./extras');
 const fetch = require('node-fetch');
 
 const wrap = fn => (...args) => fn(...args).catch(args[2])
@@ -17,10 +14,8 @@ var jsonParser = bodyParser.json()
 
 const math = require('mathjs')
 
-router.get("/", (req,res) =>{
-    var variable = req.body
-    res.status(200).json(variable)
-
+spend_attributes.get("/", (req,res) =>{    
+    res.status(200).json({ message: testEnvironmentVariable})
 });
 
 // PARA ESTE MICROSERVICIO SE NECESITA INGRESAR LOS DATOS DE LA SIGUIENTE MANERA:
@@ -47,7 +42,7 @@ Input:
 Output: Void (stores the data in the db)
 Description: Calls the b-Games-ApirestPostAtt service 
 */
-router.post('/spend_attributes_apis', jsonParser, wrap(async(req,res,next) => { 
+spend_attributes.post('/spend_attributes_apis', jsonParser, wrap(async(req,res,next) => { 
     var id_player = req.body.id_player
     var id_videogame = req.body.id_videogame
     // [2,20,4,0,0]
@@ -133,10 +128,10 @@ Description: Calls the b-Games-ApirestPostAtt service
 async function postExpendedAttribute(spend_attributes){
     
     var options = {
-        host : 'bgames-apirestpostatt.herokuapp.com',
+        host : '164.90.156.141:3002',
         path: ('/spent_attribute/')       
     };
-    var url = "https://"+options.host + options.path;
+    var url = "http://"+options.host + options.path;
     console.log("URL "+url);
     // construct the URL to post to a publication
     const MEDIUM_POST_URL = url;
@@ -147,7 +142,7 @@ async function postExpendedAttribute(spend_attributes){
     };
 
     var options2 = {
-        host : 'bgames-apirestget.herokuapp.com',
+        host : '164.90.156.141:3001',
         path: ('/modifiable_conversion_attribute')     
     };
     var url2 = "https://"+options2.host + options2.path;
@@ -211,10 +206,10 @@ function spendAttributes(dataChanges){
     console.log('last changes:')
     console.log(dataChanges)
     var options = {
-        host : 'bgames-apirestpostatt.herokuapp.com',
+        host : '164.90.156.141:3002',
         path: ('/player_attributes')       
     };
-    var url = "https://"+options.host + options.path;
+    var url = "http://"+options.host + options.path;
     console.log("URL "+url);
     // construct the URL to post to a publication
     const MEDIUM_PUT_URL = url;
@@ -243,10 +238,10 @@ Description: Calls the b-Games-ApirestPostAtt service
 async function getAndCompareAttributeLevels(new_attribute_expense){
 
   var options = {
-    host : 'bgames-apirestget.herokuapp.com',
+    host : '164.90.156.141:3001',
     path: ('/player_attributes')       
     };
-    var url = "https://"+options.host + options.path;
+    var url = "http://"+options.host + options.path;
     const MEDIUM_GET_URL = url;
 
     var headers = {
@@ -295,10 +290,10 @@ Description: Calls the b-Games-ApirestPostAtt service
 async function getConversion(id_videogame,id_modifiable_mechanic,data){
 
     var options = {
-        host : 'bgames-sensormanagement.herokuapp.com',
+        host : '164.90.156.141:3007',
         path: ('/conversion_spend_attribute')       
     };
-    var url = "https://"+options.host + options.path;
+    var url = "http://"+options.host + options.path;
     console.log("URL "+url);
     // construct the URL to post to a publication
     const MEDIUM_POST_URL = url;
@@ -369,7 +364,7 @@ Input:  Json of sensor data
 Output: Void (stores the data in the db)
 Description: Calls the b-Games-ApirestPostAtt service 
 */
-router.post('/StandardAttributes/', (req,res,next)=>{
+spend_attributes.post('/StandardAttributes/', (req,res,next)=>{
 
     try {
         var post_data = req.body;
@@ -401,7 +396,7 @@ router.post('/StandardAttributes/', (req,res,next)=>{
         console.log(data2);
 
         var options = {
-            host : 'bgames-apirestpostatt.herokuapp.com',
+            host : '164.90.156.141:3002',
             path: ('/attributes/'),
             method: 'POST',
             headers: {
@@ -464,5 +459,5 @@ router.post('/StandardAttributes/', (req,res,next)=>{
 
 
 
-module.exports = router;
+export default spend_attributes;
 
