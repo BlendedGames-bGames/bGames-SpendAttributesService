@@ -1,6 +1,7 @@
 const express = require('express');
 const spend_attributes = express.Router();
 import { testEnvironmentVariable } from '../settings';
+import {postHost,getHost,sensorHost} from '../urls'
 
 const fetch = require('node-fetch');
 
@@ -128,7 +129,7 @@ Description: Calls the b-Games-ApirestPostAtt service
 async function postExpendedAttribute(spend_attributes){
     
     var options = {
-        host : '164.90.156.141:3002',
+        host : postHost,
         path: ('/spent_attribute/')       
     };
     var url = "http://"+options.host + options.path;
@@ -142,7 +143,7 @@ async function postExpendedAttribute(spend_attributes){
     };
 
     var options2 = {
-        host : '164.90.156.141:3001',
+        host : getHost,
         path: ('/modifiable_conversion_attribute')     
     };
     var url2 = "https://"+options2.host + options2.path;
@@ -206,7 +207,7 @@ function spendAttributes(dataChanges){
     console.log('last changes:')
     console.log(dataChanges)
     var options = {
-        host : '164.90.156.141:3002',
+        host : postHost,
         path: ('/player_attributes')       
     };
     var url = "http://"+options.host + options.path;
@@ -238,7 +239,7 @@ Description: Calls the b-Games-ApirestPostAtt service
 async function getAndCompareAttributeLevels(new_attribute_expense){
 
   var options = {
-    host : '164.90.156.141:3001',
+    host : getHost,
     path: ('/player_attributes')       
     };
     var url = "http://"+options.host + options.path;
@@ -290,7 +291,7 @@ Description: Calls the b-Games-ApirestPostAtt service
 async function getConversion(id_videogame,id_modifiable_mechanic,data){
 
     var options = {
-        host : '164.90.156.141:3007',
+        host : sensorHost,
         path: ('/conversion_spend_attribute')       
     };
     var url = "http://"+options.host + options.path;
@@ -396,7 +397,7 @@ spend_attributes.post('/StandardAttributes/', (req,res,next)=>{
         console.log(data2);
 
         var options = {
-            host : '164.90.156.141:3002',
+            host : postHost,
             path: ('/attributes/'),
             method: 'POST',
             headers: {
