@@ -44,13 +44,23 @@ Output: Void (stores the data in the db)
 Description: Calls the b-Games-ApirestPostAtt service 
 */
 spend_attributes.post('/spend_attributes_apis', jsonParser, wrap(async(req,res,next) => { 
+    let keys = Object.keys(req.body)
+    console.log(keys)
+    let properJSON = JSON.parse(keys[0])
+    console.log(properJSON)
+    var id_player = properJSON.id_player;
+    var id_videogame = properJSON.id_videogame;
+    var id_modifiable_mechanic = properJSON.id_modifiable_mechanic;
+    var data = properJSON.data;
+    
+    /*
     var id_player = req.body.id_player
     var id_videogame = req.body.id_videogame
     // [2,20,4,0,0]
     var id_modifiable_mechanic = req.body.id_modifiable_mechanic
     // Ej: ['chess_blitz,records,win', 'elo','puzzle_challenge,record','puzzle_rush','chess_rapid,record,win']
     var data = req.body.data
-
+    */
     
     var conversions_data = await getConversion(id_videogame,id_modifiable_mechanic,data)
 
