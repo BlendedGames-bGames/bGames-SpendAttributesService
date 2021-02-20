@@ -52,7 +52,7 @@ spend_attributes.post('/spend_attributes_apis', jsonParser, wrap(async(req,res,n
     var id_videogame = properJSON.id_videogame;
     var id_modifiable_mechanic = properJSON.id_modifiable_mechanic;
     var data = properJSON.data;
-    
+
     /*
     var id_player = req.body.id_player
     var id_videogame = req.body.id_videogame
@@ -137,10 +137,10 @@ Output: Void (stores the data in the db)
 Description: Calls the b-Games-ApirestPostAtt service 
 */
 async function postExpendedAttribute(spend_attributes){
-    
+  
     var options = {
         host : postHost,
-        path: ('/spent_attribute/')       
+        path: ('/spent_attribute_rt')       
     };
     var url = "http://"+options.host + options.path;
     console.log("URL "+url);
@@ -181,9 +181,21 @@ async function postExpendedAttribute(spend_attributes){
         console.log(error)
         
     }
+      /*
+        var id_player = spent_attribute.id_player
+        var id_videogame = spent_attribute.id_videogame
+        var id_modifiable_mechanic = spent_attribute.id_modifiable_mechanic
+        var id_attributes = adquired_subattribute.id_attributes
+        var id_modifiable_conversion_attribute = spent_attribute.id_modifiable_conversion_attribute
+        var new_data = spent_attribute.new_data
+
+    
+    */
     const expended_attribute_final = {
         "id_player":spend_attributes.id_player,
         "id_videogame": spend_attributes.id_videogame,
+        "id_modifiable_mechanic":spend_attributes.id_modifiable_mechanic,
+        "id_attributes":spend_attributes.id_attributes,
         "id_modifiable_conversion_attribute":modifiable_conversion_attribute_relation,
         "new_data":spend_attributes.new_data
     }
@@ -218,7 +230,7 @@ function spendAttributes(dataChanges){
     console.log(dataChanges)
     var options = {
         host : postHost,
-        path: ('/player_attributes')       
+        path: ('/player_attributes_rt')       
     };
     var url = "http://"+options.host + options.path;
     console.log("URL "+url);
