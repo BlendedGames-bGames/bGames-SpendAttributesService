@@ -172,7 +172,7 @@ async function postExpendedAttribute(spend_attributes){
     var modifiable_conversion_attribute_relation;
 
     try {
-        const response = await axios.get(MEDIUM_POST_URL2,{ headers:headers, data: modifiedAdquired})
+        const response = await axios.post(MEDIUM_POST_URL2,modifiedAdquired)
         modifiable_conversion_attribute_relation = response.data.id_modifiable_conversion_attribute
         console.log("aqui va")
         console.log(modifiable_conversion_attribute_relation)
@@ -279,7 +279,7 @@ async function getAndCompareAttributeLevels(new_attribute_expense){
     console.log(dataChanges)
 
     try {
-        const response = await axios.get(MEDIUM_GET_URL,{ headers:headers, data: dataChanges})
+        const response = await axios.post(MEDIUM_GET_URL, dataChanges)
         console.log('response')
         console.log(response.data)
         // Ej: attributes: [18,20]
@@ -314,24 +314,21 @@ async function getConversion(id_videogame,id_modifiable_mechanic,data){
 
     var options = {
         host : sensorHost,
-        path: ('/conversion_spend_attribute')       
+        path: ('/conversion_spend_attribute/'+id_videogame.toString()+'/'+id_modifiable_mechanic.toString())       
     };
     var url = "http://"+options.host + options.path;
     console.log("URL "+url);
     // construct the URL to post to a publication
     const MEDIUM_POST_URL = url;
     
-    var dataChanges ={  
-        "id_videogame": id_videogame,
-        "id_modifiable_mechanic": id_modifiable_mechanic               
-    }
+    
     var headers = {
         'Content-Type': 'application/json;charset=UTF-8',
         'Access-Control-Allow-Origin': '*'
     };
 
     try {
-        const response = await axios.get(MEDIUM_POST_URL,{ headers:headers, data: dataChanges})
+        const response = await axios.get(MEDIUM_POST_URL)
         console.log('233')
         console.log(response.data)
         const data = response.data
