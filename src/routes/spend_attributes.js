@@ -156,7 +156,7 @@ async function postExpendedAttribute(spend_attributes){
         host : getHost,
         path: ('/modifiable_conversion_attribute')     
     };
-    var url2 = "https://"+options2.host + options2.path;
+    var url2 = "http://"+options2.host + options2.path;
     console.log("URL "+url2);
     // construct the URL to post to a publication
     const MEDIUM_POST_URL2 = url2;
