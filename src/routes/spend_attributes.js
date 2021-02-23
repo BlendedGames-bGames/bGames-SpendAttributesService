@@ -103,14 +103,14 @@ spend_attributes.post('/spend_attributes_apis', jsonParser, wrap(async(req,res,n
             "new_data":compareResult
         }
         spendAttributes(new_attribute_level)
-        res.status(200).json({ message: true, data:0 })
+        res.status(200).json({ message: true, data:1 })
 
         postExpendedAttribute(expended_attributes)
 
     }
     else{
         //No se tienen atributo suficiente para gastar en mecanicas
-        res.status(400).json({ message: false, data:0})
+        res.status(400).json({ message: false, data:1})
 
     }
     
