@@ -6,7 +6,7 @@ on:
       - main
   push:
     branches:
-      - docker_image
+      - main
 
 jobs:
   build-and-deploy-back:
