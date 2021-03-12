@@ -366,6 +366,8 @@ async function getConversion(id_videogame,id_modifiable_mechanic,data){
 function conversionDataAttribute(operations,data){
     // operations Ej: ['x+2','sqrt(x+5)','x/4']
     // data_changes Ej: [2,20,4]
+    
+    //REPUSH
     var operation,data,node,code, eval_data, single_result;
     var results = []
     for (let i = 0; i < operations.length; i++) {
