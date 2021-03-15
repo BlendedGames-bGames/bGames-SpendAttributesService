@@ -370,26 +370,17 @@ function conversionDataAttribute(operations,data_changes){
     //REPUSH
     var operation,data,node,code, eval_data, single_result;
     var results = []
-    for (let i = 0; i < operations.length; i++) {
-        operation = operations[i];
-        data = data_changes[i];
-        node = math.parse(operation)   // returns the root Node of an expression tree
-        code = node.compile()        // returns {evaluate: function (scope) {...}}
-        eval_data = {}
+    operation = operations[0];
+    data = data_changes;
+    node = math.parse(operation)   // returns the root Node of an expression tree
+    code = node.compile()        // returns {evaluate: function (scope) {...}}
+    eval_data = {}
+    eval_data['a'] = data
+    
+    single_result = code.evaluate(eval_data)
 
-        if(Array.isArray(data)){
-            for (let index = 0; index < data.length; index++) {
-                const element = data[index];
-                eval_data[abc[index]] = element
-            }
-        }
-        else{
-            eval_data['a'] = data
-        }
-        single_result = code.evaluate(eval_data)
-
-        results.push(single_result) // returns result
-    }
+    results.push(single_result) // returns result
+    
     //Ej [4,5,1]
     return results
 }
