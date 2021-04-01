@@ -91,13 +91,14 @@ spend_attributes.post('/spend_attributes_apis', jsonParser, wrap(async(req,res,n
 
     var new_attribute_expense = {
         "id_player":id_player,
-        "id_attributes": id_attributes,       
-        "new_data":result
+        "id_attributes": arrayToString(id_attributes),       
+        "new_data":arrayToString(result)
     }
 
     var new_attribute_level;
     var compareResult = await getAndCompareAttributeLevels(new_attribute_expense)
     var new_attribute_level_string;
+    var new_attribute_expense_string;
     if(compareResult != -1){
         new_attribute_level = {
             "id_player":id_player,
@@ -105,7 +106,8 @@ spend_attributes.post('/spend_attributes_apis', jsonParser, wrap(async(req,res,n
             "new_data":arrayToString(compareResult)
         }
         new_attribute_level_string = JSON.stringify(new_attribute_level)
-        res.status(200).json({ message: true, data:1, consumedAtt:new_attribute_level_string })
+        new_attribute_expense_string = JSON.stringify(new_attribute_expense)
+        res.status(200).json({ message: true, data:1, consumedAtt:new_attribute_level_string, expenseAtt:new_attribute_expense_string })
 
 
     }
@@ -140,7 +142,7 @@ function StringtoArray(string){
 
     var array_string = string.split(",")
     let array_aux = []
-    for(element of array_string){
+    for(const element of array_string){
         array_aux.push(parseInt(element))
     }
 
@@ -246,19 +248,33 @@ spend_attributes.post("/consume_attributes", jsonParser, wrap(async(req,res,next
     console.log('este es el consume att')
     console.log(consumedAtt)
 
+    properJSON = JSON.parse(keys[1])
+    console.log(properJSON)
+    var expensedAtt = JSON.parse(properJSON.expensedAtt);
+    console.log('este es el expensed att')
+    console.log(expensedAtt)
+
     let consumeAttProper = {
         "id_player": consumedAtt.id_player,
         "id_attributes": StringtoArray(consumedAtt.id_attributes),
         "new_data": StringtoArray(consumedAtt.new_data),
 
     }
+    let expensedAttProper = {
+        "id_player": expensedAtt.id_player,
+        "id_attributes": StringtoArray(expensedAtt.id_attributes),
+        "new_data": StringtoArray(expensedAtt.new_data),
+
+    }
     console.log('este es el consume att pero en arreglos con enteros')
 
     console.log(consumeAttProper)
-    
+    console.log('este es el expense att pero en arreglos con enteros')
+
+    console.log(expensedAttProper)
     await spendAttributes(consumeAttProper)
 
-    await postExpendedAttribute(consumeAttProper)
+    await postExpendedAttribute(expensedAttProper)
     res.status(200).json({ message: true, data:1 })
 
 
