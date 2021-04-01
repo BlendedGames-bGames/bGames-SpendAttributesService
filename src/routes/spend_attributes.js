@@ -135,6 +135,17 @@ function arrayToString(arrays){
     return array_string
 
 }
+
+function StringtoArray(string){
+
+    var array_string = string.split(",")
+    let array_aux = []
+    for(element of array_string){
+        array_aux.push(parseInt(element))
+    }
+
+    return array_string
+}
 /*
 Input:  
  var expended_attributes ={  
@@ -232,10 +243,22 @@ spend_attributes.post("/consume_attributes", jsonParser, wrap(async(req,res,next
     let properJSON = JSON.parse(keys[0])
     console.log(properJSON)
     var consumedAtt = JSON.parse(properJSON.consumedAtt);
-    
-    await spendAttributes(consumedAtt)
+    console.log('este es el consume att')
+    console.log(consumedAtt)
 
-    await postExpendedAttribute(consumedAtt)
+    let consumeAttProper = {
+        "id_player": consumedAtt.id_player,
+        "id_attributes": StringtoArray(consumedAtt.id_attributes),
+        "new_data": StringtoArray(consumedAtt.new_data),
+
+    }
+    console.log('este es el consume att pero en arreglos con enteros')
+
+    console.log(consumeAttProper)
+    
+    await spendAttributes(consumeAttProper)
+
+    await postExpendedAttribute(consumeAttProper)
     res.status(200).json({ message: true, data:1 })
 
 
