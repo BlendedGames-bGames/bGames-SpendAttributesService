@@ -84,9 +84,9 @@ spend_attributes.post('/spend_attributes_apis', jsonParser, wrap(async(req,res,n
         "id_player": id_player,   
         "id_videogame": id_videogame,      
         "id_modifiable_mechanic": id_modifiable_mechanic,
-        "id_conversion": id_conversion,   
-        "id_attributes":id_attributes,
-        "new_data": result
+        "id_conversion": arrayToString(id_conversion),   
+        "id_attributes":arrayToString(id_attributes),
+        "new_data": arrayToString(result)
     }
 
     var new_attribute_expense = {
