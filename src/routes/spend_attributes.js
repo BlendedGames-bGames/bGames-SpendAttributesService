@@ -97,16 +97,16 @@ spend_attributes.post('/spend_attributes_apis', jsonParser, wrap(async(req,res,n
 
     var new_attribute_level;
     var compareResult = await getAndCompareAttributeLevels(new_attribute_expense)
+    var new_attribute_level_string;
     if(compareResult != -1){
         new_attribute_level = {
             "id_player":id_player,
             "id_attributes": id_attributes,       
             "new_data":compareResult
         }
-        spendAttributes(new_attribute_level)
-        res.status(200).json({ message: true, data:1 })
+        new_attribute_level_string = JSON.stringify(new_attribute_level)
+        res.status(200).json({ message: true, data:1, consumedAtt:new_attribute_level_string })
 
-        postExpendedAttribute(expended_attributes)
 
     }
     else{
@@ -204,7 +204,7 @@ async function postExpendedAttribute(spend_attributes){
     console.log(JSON.stringify(expended_attribute_final))
     try {
        
-        const response = axios.post(MEDIUM_POST_URL, expended_attribute_final);
+        const response = await axios.post(MEDIUM_POST_URL, expended_attribute_final);
         console.log(response)
         
     } 
@@ -212,6 +212,21 @@ async function postExpendedAttribute(spend_attributes){
         console.error(error);
     } 
 }
+
+spend_attributes.post("/consume_attributes", jsonParser, wrap(async(req,res,next) => { 
+    let keys = Object.keys(req.body)
+    console.log(keys)
+    let properJSON = JSON.parse(keys[0])
+    console.log(properJSON)
+    var consumedAtt = JSON.parse(properJSON.consumedAtt);
+    
+    await spendAttributes(consumedAtt)
+
+    await postExpendedAttribute(consumedAtt)
+    res.status(200).json({ message: true, data:1 })
+
+
+}))
 
 /*
 Input:  
@@ -225,7 +240,7 @@ var dataChanges ={
 Output: Void (stores the data in the db)
 Description: Calls the b-Games-ApirestPostAtt service 
 */
-function spendAttributes(dataChanges){
+async function spendAttributes(dataChanges){
    
     console.log('last changes:')
     console.log(dataChanges)
@@ -238,7 +253,7 @@ function spendAttributes(dataChanges){
     // construct the URL to post to a publication
     const MEDIUM_PUT_URL = url;
     try {
-        const response = axios.put(MEDIUM_PUT_URL,dataChanges);
+        const response = await axios.put(MEDIUM_PUT_URL,dataChanges);
         console.log(response)
         
     } 
