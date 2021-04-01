@@ -101,8 +101,8 @@ spend_attributes.post('/spend_attributes_apis', jsonParser, wrap(async(req,res,n
     if(compareResult != -1){
         new_attribute_level = {
             "id_player":id_player,
-            "id_attributes": id_attributes,       
-            "new_data":compareResult
+            "id_attributes": arrayToString(id_attributes),       
+            "new_data":arrayToString(compareResult)
         }
         new_attribute_level_string = JSON.stringify(new_attribute_level)
         res.status(200).json({ message: true, data:1, consumedAtt:new_attribute_level_string })
@@ -124,6 +124,17 @@ spend_attributes.post('/spend_attributes_apis', jsonParser, wrap(async(req,res,n
     */
 
 }))
+
+
+function arrayToString(arrays){
+    var array_string = ''
+    for (const element of arrays) {
+        array_string+=element+','
+    }
+    array_string = array_string.substring(0,array_string.length-1)
+    return array_string
+
+}
 /*
 Input:  
  var expended_attributes ={  
