@@ -146,7 +146,7 @@ function StringtoArray(string){
         array_aux.push(parseInt(element))
     }
 
-    return array_string
+    return array_aux
 }
 /*
 Input:  
