@@ -98,7 +98,7 @@ spend_attributes.post('/spend_attributes_apis', jsonParser, wrap(async(req,res,n
     var new_attribute_level;
     var compareResult = await getAndCompareAttributeLevels(new_attribute_expense)
     var new_attribute_level_string;
-    var new_attribute_expense_string;
+    var expended_attributes_string;
     if(compareResult != -1){
         new_attribute_level = {
             "id_player":id_player,
@@ -106,8 +106,8 @@ spend_attributes.post('/spend_attributes_apis', jsonParser, wrap(async(req,res,n
             "new_data":arrayToString(compareResult)
         }
         new_attribute_level_string = JSON.stringify(new_attribute_level)
-        new_attribute_expense_string = JSON.stringify(new_attribute_expense)
-        res.status(200).json({ message: true, data:1, consumedAtt:new_attribute_level_string, expenseAtt:new_attribute_expense_string })
+        expended_attributes_string = JSON.stringify(expended_attributes)
+        res.status(200).json({ message: true, data:1, consumedAtt:new_attribute_level_string, expensedAtt:expended_attributes_string })
 
 
     }
@@ -261,7 +261,11 @@ spend_attributes.post("/consume_attributes", jsonParser, wrap(async(req,res,next
 
     }
     let expensedAttProper = {
+
         "id_player": expensedAtt.id_player,
+        "id_videogame": expensedAtt.id_videogame,      
+        "id_modifiable_mechanic": expensedAtt.id_modifiable_mechanic,
+        "id_conversion":StringtoArray(expensedAtt.id_conversion),
         "id_attributes": StringtoArray(expensedAtt.id_attributes),
         "new_data": StringtoArray(expensedAtt.new_data),
 
