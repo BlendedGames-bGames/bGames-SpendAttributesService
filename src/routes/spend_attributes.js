@@ -214,6 +214,8 @@ async function postExpendedAttribute(spend_attributes){
 }
 
 spend_attributes.post("/consume_attributes", jsonParser, wrap(async(req,res,next) => { 
+    console.log("esto es lo que me entro!:")
+    console.log(req.body)
     let keys = Object.keys(req.body)
     console.log(keys)
     let properJSON = JSON.parse(keys[0])
