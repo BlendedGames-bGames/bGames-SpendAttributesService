@@ -245,13 +245,9 @@ spend_attributes.post("/consume_attributes", jsonParser, wrap(async(req,res,next
     let properJSON = JSON.parse(keys[0])
     console.log(properJSON)
     var consumedAtt = JSON.parse(properJSON.consumedAtt);
-    console.log('este es el consume att')
-    console.log(consumedAtt)
-
-    properJSON = JSON.parse(keys[1])
-    console.log(properJSON)
     var expensedAtt = JSON.parse(properJSON.expensedAtt);
-    console.log('este es el expensed att')
+
+    console.log(consumedAtt)
     console.log(expensedAtt)
 
     let consumeAttProper = {
