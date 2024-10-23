@@ -45,14 +45,11 @@ Output: Void (stores the data in the db)
 Description: Calls the b-Games-ApirestPostAtt service 
 */
 spend_attributes.post('/spend_attributes_apis', jsonParser, wrap(async(req,res,next) => { 
-    let keys = Object.keys(req.body)
-    console.log(keys)
-    let properJSON = JSON.parse(keys[0])
-    console.log(properJSON)
-    var id_player = properJSON.id_player;
-    var id_videogame = properJSON.id_videogame;
-    var id_modifiable_mechanic = properJSON.id_modifiable_mechanic;
-    var data = properJSON.data;
+    
+    var id_player = req.body.id_player;
+    var id_videogame = req.body.id_videogame;
+    var id_modifiable_mechanic = req.body.id_modifiable_mechanic;
+    var data = req.body.data;
 
     /*
     var id_player = req.body.id_player
@@ -107,8 +104,9 @@ spend_attributes.post('/spend_attributes_apis', jsonParser, wrap(async(req,res,n
         }
         new_attribute_level_string = JSON.stringify(new_attribute_level)
         expended_attributes_string = JSON.stringify(expended_attributes)
-        res.status(200).json({ message: true, data:1, consumedAtt:new_attribute_level_string, expensedAtt:expended_attributes_string })
-
+        res.locals.consumedAtt = new_attribute_level_string;
+        res.locals.expensedAtt = expended_attributes_string;
+        next();
 
     }
     else{
@@ -125,7 +123,44 @@ spend_attributes.post('/spend_attributes_apis', jsonParser, wrap(async(req,res,n
     }
     */
 
-}))
+}), wrap(async(req, res, next) => {
+    console.log("esto es lo que me entro!:")
+    
+    const consumedAtt = JSON.parse(res.locals.consumedAtt);
+    const expensedAtt = JSON.parse(res.locals.expensedAtt);
+
+    console.log(consumedAtt)
+    console.log(expensedAtt)
+
+    let consumeAttProper = {
+        "id_player": consumedAtt.id_player,
+        "id_attributes": StringtoArray(consumedAtt.id_attributes),
+        "new_data": StringtoArray(consumedAtt.new_data),
+
+    }
+    let expensedAttProper = {
+
+        "id_player": expensedAtt.id_player,
+        "id_videogame": expensedAtt.id_videogame,      
+        "id_modifiable_mechanic": expensedAtt.id_modifiable_mechanic,
+        "id_conversion":StringtoArray(expensedAtt.id_conversion),
+        "id_attributes": StringtoArray(expensedAtt.id_attributes),
+        "new_data": StringtoArray(expensedAtt.new_data),
+
+    }
+    console.log('este es el consume att pero en arreglos con enteros')
+
+    console.log(consumeAttProper)
+    console.log('este es el expense att pero en arreglos con enteros')
+
+    console.log(expensedAttProper)
+    await spendAttributes(consumeAttProper)
+
+    await postExpendedAttribute(expensedAttProper)
+    res.status(200).json({ message: true, data:1 })
+
+
+}));
 
 
 function arrayToString(arrays){
@@ -139,8 +174,12 @@ function arrayToString(arrays){
 }
 
 function StringtoArray(string){
+    if (string.length > 1) {
+        var array_string = string.split(",")
+    }else{
+        var array_string = string
+    }
 
-    var array_string = string.split(",")
     let array_aux = []
     for(const element of array_string){
         array_aux.push(parseInt(element))
@@ -237,48 +276,48 @@ async function postExpendedAttribute(spend_attributes){
     } 
 }
 
-spend_attributes.post("/consume_attributes", jsonParser, wrap(async(req,res,next) => { 
-    console.log("esto es lo que me entro!:")
-    console.log(req.body)
-    let keys = Object.keys(req.body)
-    console.log(keys)
-    let properJSON = JSON.parse(keys[0])
-    console.log(properJSON)
-    var consumedAtt = JSON.parse(properJSON.consumedAtt);
-    var expensedAtt = JSON.parse(properJSON.expensedAtt);
+// spend_attributes.post("/consume_attributes", jsonParser, wrap(async(req,res,next) => { 
+//     console.log("esto es lo que me entro!:")
+//     console.log(req.body)
+//     let keys = Object.keys(req.body)
+//     console.log(keys)
+//     let properJSON = keys
+//     console.log(properJSON)
+//     var consumedAtt = JSON.parse(req.body.consumedAtt);
+//     var expensedAtt = JSON.parse(req.body.expensedAtt);
 
-    console.log(consumedAtt)
-    console.log(expensedAtt)
+//     console.log(consumedAtt)
+//     console.log(expensedAtt)
 
-    let consumeAttProper = {
-        "id_player": consumedAtt.id_player,
-        "id_attributes": StringtoArray(consumedAtt.id_attributes),
-        "new_data": StringtoArray(consumedAtt.new_data),
+//     let consumeAttProper = {
+//         "id_player": consumedAtt.id_player,
+//         "id_attributes": StringtoArray(consumedAtt.id_attributes),
+//         "new_data": StringtoArray(consumedAtt.new_data),
 
-    }
-    let expensedAttProper = {
+//     }
+//     let expensedAttProper = {
 
-        "id_player": expensedAtt.id_player,
-        "id_videogame": expensedAtt.id_videogame,      
-        "id_modifiable_mechanic": expensedAtt.id_modifiable_mechanic,
-        "id_conversion":StringtoArray(expensedAtt.id_conversion),
-        "id_attributes": StringtoArray(expensedAtt.id_attributes),
-        "new_data": StringtoArray(expensedAtt.new_data),
+//         "id_player": expensedAtt.id_player,
+//         "id_videogame": expensedAtt.id_videogame,      
+//         "id_modifiable_mechanic": expensedAtt.id_modifiable_mechanic,
+//         "id_conversion":StringtoArray(expensedAtt.id_conversion),
+//         "id_attributes": StringtoArray(expensedAtt.id_attributes),
+//         "new_data": StringtoArray(expensedAtt.new_data),
 
-    }
-    console.log('este es el consume att pero en arreglos con enteros')
+//     }
+//     console.log('este es el consume att pero en arreglos con enteros')
 
-    console.log(consumeAttProper)
-    console.log('este es el expense att pero en arreglos con enteros')
+//     console.log(consumeAttProper)
+//     console.log('este es el expense att pero en arreglos con enteros')
 
-    console.log(expensedAttProper)
-    await spendAttributes(consumeAttProper)
+//     console.log(expensedAttProper)
+//     await spendAttributes(consumeAttProper)
 
-    await postExpendedAttribute(expensedAttProper)
-    res.status(200).json({ message: true, data:1 })
+//     await postExpendedAttribute(expensedAttProper)
+//     res.status(200).json({ message: true, data:1 })
 
 
-}))
+// }))
 
 /*
 Input:  
@@ -357,7 +396,7 @@ async function getAndCompareAttributeLevels(new_attribute_expense){
         var results = []
 
         for (let i = 0; i < attributes.length; i++) {
-            single_result = attributes[i]-new_attribute_expense.new_data[i]
+            single_result = attributes-new_attribute_expense.new_data
             if(single_result >= 0){
                 results.push(single_result)
             }
@@ -442,7 +481,7 @@ function conversionDataAttribute(operations,data_changes){
     node = math.parse(operation)   // returns the root Node of an expression tree
     code = node.compile()        // returns {evaluate: function (scope) {...}}
     eval_data = {}
-    eval_data['a'] = data
+    eval_data['x'] = data
     
     single_result = code.evaluate(eval_data)
 
